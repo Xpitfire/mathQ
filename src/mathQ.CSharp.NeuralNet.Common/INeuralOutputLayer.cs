@@ -8,6 +8,9 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public interface INeuralOutputLayer<TOutput> : INeuralLayer<double, TOutput>
     {
-        Func<IEnumerable<double>, TOutput>  OutputValuesTransformation { set; }
+        TOutput OutputValue { get; set; }
+        Func<IEnumerable<double>, TOutput>  OutputValuesTransformation { get; set; }
+
+        void Transform();
     }
 }

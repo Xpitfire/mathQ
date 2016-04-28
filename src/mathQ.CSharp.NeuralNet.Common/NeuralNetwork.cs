@@ -14,7 +14,21 @@ namespace mathQ.CSharp.NeuralNet.Common
 
         public TOutput Evaluate(IEnumerable<TInput> values)
         {
-            return default(TOutput); // TODO
+            InputLayer.InputValues = values;
+            InputLayer.Transform();
+            var curInputValues = InputLayer.OutputValues;
+            var nextLayer = HiddenLayers?.GetEnumerator();
+            while (nextLayer?.MoveNext() ?? false)
+            {
+                var curLayer = nextLayer.Current;
+                curLayer.InputValues = curInputValues;
+                curLayer.Compute();
+                curLayer.Evaluate();
+                curInputValues = curLayer.OutputValues;
+            }
+            OutputLayer.InputValues = curInputValues;
+            OutputLayer.Transform();
+            return OutputLayer.OutputValue;
         }
         
         public void Train(TrainingData<TInput, TOutput> trainingDataset)

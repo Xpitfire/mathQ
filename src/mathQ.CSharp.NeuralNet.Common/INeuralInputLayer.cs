@@ -5,6 +5,7 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public interface INeuralInputLayer<TInput> : INeuralLayer<TInput, double>
     {
-        Func<IEnumerable<TInput>, double> InputValueTransformation { set; }
+        Func<TInput, double> InputValueTransformation { get; set; }
+        void Transform();
     }
 }

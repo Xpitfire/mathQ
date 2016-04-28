@@ -10,10 +10,11 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         public IEnumerable<TInput> InputValues { get; set; }
         public IEnumerable<double> OutputValues { get; set; }
-
-        public Func<IEnumerable<TInput>, double> InputValueTransformation { get; set; }
-
-        public event NeuronSignal NeuronSignal;
-
+        public Func<TInput, double> InputValueTransformation { get; set; }
+        public void Transform()
+        {
+            OutputValues = InputValues.Select(
+                inputValue => InputValueTransformation(inputValue)).ToList();
+        }
     }
 }

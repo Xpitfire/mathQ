@@ -1,8 +1,12 @@
-﻿namespace mathQ.CSharp.NeuralNet.Common
-{
-    public delegate void NeuronSignal(object sender, NeuronSignalArgs args);
+﻿using System;
 
-    public class NeuronSignalArgs
+namespace mathQ.CSharp.NeuralNet.Common
+{
+    public delegate void NeuronSignal<TType>(object sender, NeuronSignalArgs<TType> args);
+
+    public class NeuronSignalArgs<TType> : EventArgs
     {
+        public TType Value { get; set; }
     }
+
 }

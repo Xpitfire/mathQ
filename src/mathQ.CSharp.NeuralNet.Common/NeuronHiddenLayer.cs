@@ -10,20 +10,23 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         public IEnumerable<double> InputValues { get; set; }
         public IEnumerable<double> OutputValues { get; set; }
-        public event NeuronSignal NeuronSignal;
-        public IEnumerable<IPerceptron> Perceptrons { get; }
-        public IEnumerable<double> Evaluate(IEnumerable<double> inputValues)
+        public IEnumerable<IPerceptron> Perceptrons { get; set; }
+        
+        public void Compute()
         {
-            throw new NotImplementedException();
-        }
-
-        public void TrainPerceptrons(IReadOnlyList<double> weights, IReadOnlyList<double> biases)
-        {
+            var values = new List<double>();
             foreach (var perceptron in Perceptrons)
             {
-                perceptron.Weights = weights;
-                perceptron.Biases = biases;
+                perceptron.InputValues = InputValues;
+                perceptron.Evaluate();
+                values.Add(perceptron.OutputValue);
             }
+            OutputValues = values;
+        }
+
+        public void Evaluate()
+        {
+            OutputValues = OutputValues.Where(v => v > 0.0);
         }
     }
 }

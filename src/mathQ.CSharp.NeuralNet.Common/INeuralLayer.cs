@@ -6,8 +6,6 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         IEnumerable<TInput> InputValues { get; set; }
         IEnumerable<TOutput> OutputValues { get; set; }
-
-        event NeuronSignal NeuronSignal;
     }
 
     
