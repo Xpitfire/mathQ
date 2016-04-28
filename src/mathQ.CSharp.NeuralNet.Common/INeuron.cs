@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace mathQ.CSharp.NeuralNet
+namespace mathQ.CSharp.NeuralNet.Common
 {
     public delegate TOutput NeuronFunction<in TInput, out TOutput>(IReadOnlyList<TInput> values);
 
