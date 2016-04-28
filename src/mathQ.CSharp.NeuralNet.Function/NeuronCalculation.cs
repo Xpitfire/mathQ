@@ -7,7 +7,7 @@ namespace mathQ.CSharp.NeuralNet.Function
 {
     public sealed class NeuronCalculation
     {
-        public static double PerceptronFunction(IReadOnlyList<double> values, IReadOnlyList<double> weights, IReadOnlyList<double> biases)
+        public static double PerceptronSigmoidFunction(IReadOnlyList<double> values, IReadOnlyList<double> weights, IReadOnlyList<double> biases)
         {
             if (values.Count() != weights.Count() 
                 && values.Count() != biases.Count())

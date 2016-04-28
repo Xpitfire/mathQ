@@ -22,7 +22,6 @@ namespace mathQ.CSharp.NeuralNet.Common
             {
                 var curLayer = nextLayer.Current;
                 curLayer.InputValues = curInputValues;
-                curLayer.Compute();
                 curLayer.Evaluate();
                 curInputValues = curLayer.OutputValues;
             }

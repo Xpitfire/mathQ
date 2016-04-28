@@ -10,9 +10,9 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
     public class NeuralNetTest
     {
         [TestMethod]
-        public void TestNeuralNetOneHiddenLayerOnePerceptrons()
+        public void TestNeuralNetOneHiddenLayerTwoPerceptrons()
         {
-            var inputLayer = new NeuralInputLayer<char>
+            var inputLayer = new NeuralInputLayer<int>
             {
                 InputValueTransformation = chr => chr
             };
@@ -24,30 +24,38 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
                     {
                         new Perceptron
                         {
-                            Weights = new List<double> { 2.5, 6.4 },
-                            Biases = new List<double> { 5, 3 },
-                            ValueTransformation = NeuronCalculation.PerceptronFunction
+                            Weights = new List<double> { .5, .2, .3, .4, .7 },
+                            Biases = new List<double> { 1, 2, 3, 4, 5 },
+                            PerceptronFunction = NeuronCalculation.PerceptronSigmoidFunction
+                        },
+
+                        new Perceptron
+                        {
+                            Weights = new List<double> { .1, .8, .7, .3, .1 },
+                            Biases = new List<double> { 5, 4, 3, 2, 1 },
+                            PerceptronFunction = NeuronCalculation.PerceptronSigmoidFunction
                         }
                     }
                 }
             };
-            var outputLayer = new NeuralOutputLayer<int>
+            var outputLayer = new NeuralOutputLayer<double>
             {
-                OutputValuesTransformation = values => (int) values.Sum()
+                OutputValuesTransformation = values => values.Sum()
             };
 
-            var trainingData = new TrainingData<char, int>
+            var trainingData = new TrainingData<int, double>
             {
                 InputLayer = inputLayer,
                 HiddenLayers = hiddenLayers,
                 OutputLayer = outputLayer
             };
 
-            var neuralNet = new NeuralNetwork<char, int>();
+            var neuralNet = new NeuralNetwork<int, double>();
             neuralNet.Train(trainingData);
-
-            var result = neuralNet.Evaluate(new List<char> { 'A', 'C' });
-            Console.WriteLine($"NeuralNet-Output: {result}");
+            
+            Assert.IsTrue(neuralNet.Evaluate(new List<int> { 2, -5, 4, -32, -234 }) < .1);
+            Assert.IsTrue(neuralNet.Evaluate(new List<int> {2, 2, 4, -32, 34}) > 1.5);
+            Assert.IsTrue(neuralNet.Evaluate(new List<int> {2, 22, 554, -32, -234}) > 1.9);
         }
     }
 }

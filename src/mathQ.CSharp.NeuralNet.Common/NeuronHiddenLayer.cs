@@ -10,9 +10,9 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         public IEnumerable<double> InputValues { get; set; }
         public IEnumerable<double> OutputValues { get; set; }
-        public IEnumerable<IPerceptron> Perceptrons { get; set; }
+        public IEnumerable<INeuron<double, double>> Perceptrons { get; set; }
         
-        public void Compute()
+        public void Evaluate()
         {
             var values = new List<double>();
             foreach (var perceptron in Perceptrons)
@@ -22,11 +22,6 @@ namespace mathQ.CSharp.NeuralNet.Common
                 values.Add(perceptron.OutputValue);
             }
             OutputValues = values;
-        }
-
-        public void Evaluate()
-        {
-            OutputValues = OutputValues.Where(v => v > 0.0);
         }
     }
 }

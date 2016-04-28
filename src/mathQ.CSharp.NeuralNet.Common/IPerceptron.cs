@@ -12,7 +12,6 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         IEnumerable<double> Weights { get; set; }
         IEnumerable<double> Biases { get; set; }
-        PerceptronFunction ValueTransformation { set; }
-        void Evaluate();
+        PerceptronFunction PerceptronFunction { set; }
     }
 }

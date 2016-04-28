@@ -7,20 +7,23 @@ using System.Threading.Tasks;
 
 namespace mathQ.CSharp.NeuralNet.Common
 {
-    public struct Perceptron : IPerceptron
+    public class Perceptron : IPerceptron
     {
         public IEnumerable<double> InputValues { get; set; }
         public double OutputValue { get; set; }
+        public NeuronFunction<double, double> TransformationFunction { get; set; }
         public IEnumerable<double> Weights { get; set; }
         public IEnumerable<double> Biases { get; set; }
-        public PerceptronFunction ValueTransformation { private get; set; }
+        public PerceptronFunction PerceptronFunction { private get; set; }
+
+        public Perceptron()
+        {
+            TransformationFunction = values => PerceptronFunction(values, Weights.ToList(), Biases.ToList());
+        }
+        
         public void Evaluate()
         {
-            OutputValue = ValueTransformation(
-                InputValues.ToList(), 
-                Weights.ToList(), 
-                Biases.ToList());
+            OutputValue = TransformationFunction(InputValues.ToList());
         }
-
     }
 }
