@@ -11,8 +11,7 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         public INeuralNetwork<TInput, TOutput> NeuralNetwork { get; set; }
         public int MaxEpochs { get; set; }
-        public double LearningRate { get; set; }
-        public double Momentum { get; set; }
+        public double LearningRate { get; set; } = 1.0;
 
         public NeuralNetworkTraining()
         {
@@ -42,6 +41,18 @@ namespace mathQ.CSharp.NeuralNet.Common
                 });
                 numberOfInputValues = numberOfPerceptrons;
             }
+            NeuralNetwork.OutputLayer = new NeuralOutputLayer<TOutput>
+            {
+                Perceptrons = new List<IPerceptron>(numberOfInputValues)
+            };
+            for (var i = 0; i < numberOfInputValues; i++)
+            {
+                NeuralNetwork.OutputLayer.Perceptrons.Add(new Perceptron
+                {
+                    Weights = new double[numberOfInputValues],
+                    PerceptronFunction = NeuronCalculation.ActivationFunction
+                });
+            }
         }
 
         public void Randomize()
@@ -64,45 +75,43 @@ namespace mathQ.CSharp.NeuralNet.Common
             }
         }
         
-        public void Train(IList<Tuple<TInput, double>> trainingData)
+        public void Train(IList<Tuple<IList<TInput>, IList<double>>> trainingData)
         {
+            Randomize();
             for (var epoch = 0; epoch < MaxEpochs; epoch++)
             {
-                Randomize();
-                for (var idx = 0; idx < trainingData.Count; idx++)
+                foreach (var data in trainingData)
                 {
-                    var prediction = ComputeHiddenLayerData(trainingData[idx].Item1);
-                    for (var i = NeuralNetwork.HiddenLayers.Count - 1; i >= 0 ; i--)
+                    NeuralNetwork.Evaluate(data.Item1);
+                    IList<double> computedValues = NeuralNetwork.OutputLayer.OutputValues;
+                    IList<double> actualValues = data.Item2;
+
+                    IList<INeuralHiddenLayer> layers = NeuralNetwork.HiddenLayers;
+                    INeuralOutputLayer<TOutput> outputLayer = NeuralNetwork.OutputLayer;
+
+                    IList<IPerceptron> perceptrons = outputLayer.Perceptrons;
+                    
+                    for (var i = layers.Count - 1; layers.Count > 0; i--)
                     {
-                        for (var j = 0; j < NeuralNetwork.HiddenLayers[i].Perceptrons.Count; j++)
-                        {
-                            var perceptron = NeuralNetwork.HiddenLayers[i].Perceptrons[j];
-                            var actual = trainingData[idx].Item2;
-                            var z = NeuronCalculation.ZVectorFunction(
-                                perceptron.InputValues, perceptron.Weights, perceptron.Bias);
-                            var delta = (prediction[i][j] - actual) * 
-                                (NeuronCalculation.SigmoidPrimeFunction(z));
-
-                            perceptron.Bias = delta;
-
-                            if (i != 0)
-                            {
-                                var prevPerceptrons = NeuralNetwork.HiddenLayers[i - 1].Perceptrons;
-                                for (var k = 0; k < prevPerceptrons.Count; k++)
-                                {
-                                    perceptron.Weights[k] = delta * prevPerceptrons[k].OutputValue * perceptron.Weights[k];
-                                }
-                            }
-                            else
-                            {
-                                for (var k = 0; k < perceptron.Weights.Count; k++)
-                                {
-                                    perceptron.Weights[k] = delta * perceptron.Weights[k];
-                                }
-                            }
-                        }
+                        var curLayer = layers[i];
+                        IList<double> delta = NeuronCalculation.VectorSubtraction(actualValues, computedValues);
+                        double prevLayerDelta = NeuronCalculation.VectorDotProduct(delta, NeuronCalculation.GradientSigmoidFunction(computedValues));
+                        UpdateWeights(perceptrons, prevLayerDelta, layers[i]);
+                        actualValues = layers[i].OutputValues;
+                        computedValues = layers[i - 1].OutputValues;
+                        perceptrons = layers[i - 1].Perceptrons;
                     }
+                    
                 }
+            }
+        }
+
+        private void UpdateWeights(IList<IPerceptron> perceptrons, double prevLayerDelta, INeuralHiddenLayer neuralHiddenLayer)
+        {
+            foreach (var perceptron in perceptrons)
+            {
+                perceptron.Weights = NeuronCalculation.VectorAdd(perceptron.Weights, 
+                    NeuronCalculation.VectorScalarMultiplication(prevLayerDelta, neuralHiddenLayer.OutputValues));
             }
         }
 
@@ -134,17 +143,16 @@ namespace mathQ.CSharp.NeuralNet.Common
             }
         }
         
-        private double[][] ComputeHiddenLayerData(TInput value)
+        private double[][] ComputeHiddenLayerData(IList<double> values)
         {
-            var dataSet = new double[NeuralNetwork.HiddenLayers.Count][];
+            var numberOfLayers = NeuralNetwork.HiddenLayers.Count + 1;
+            var dataSet = new double[numberOfLayers][];
             for (var i = 0; i < dataSet.Length; i++)
             {
                 dataSet[i] = new double[NeuralNetwork.HiddenLayers[i].Perceptrons.Count];
             }
-
-            NeuralNetwork.InputLayer.InitialDataSource = value;
-            NeuralNetwork.InputLayer.Transform();
-            var curInputValues = NeuralNetwork.InputLayer.OutputValues;
+            
+            var curInputValues = values;
             var nextLayer = NeuralNetwork.HiddenLayers?.GetEnumerator();
 
             var j = 0;
@@ -165,6 +173,7 @@ namespace mathQ.CSharp.NeuralNet.Common
             }
             NeuralNetwork.OutputLayer.InputValues = curInputValues;
             NeuralNetwork.OutputLayer.Transform();
+            dataSet[numberOfLayers - 1] = NeuralNetwork.OutputLayer.OutputValues.ToArray(); 
 
             return dataSet;
         }

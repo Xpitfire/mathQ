@@ -8,13 +8,12 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public class NeuralInputLayer<TInput> : INeuralInputLayer<TInput>
     {
-        public TInput InitialDataSource { get; set; }
         public IList<TInput> InputValues { get; set; }
         public IList<double> OutputValues { get; set; }
-        public Func<TInput, IList<double>> InputValueTransformation { get; set; }
+        public Func<IList<TInput>, IList<double>> InputValueTransformation { get; set; }
         public void Transform()
         {
-            OutputValues = InputValueTransformation(InitialDataSource);
+            OutputValues = InputValueTransformation(InputValues);
         }
     }
 }

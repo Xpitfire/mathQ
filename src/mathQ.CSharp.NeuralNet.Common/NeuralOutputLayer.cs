@@ -9,14 +9,26 @@ namespace mathQ.CSharp.NeuralNet.Common
     public class NeuralOutputLayer<TOutput> : INeuralOutputLayer<TOutput>
     {
         public IList<double> InputValues { get; set; }
-        public IList<TOutput> OutputValues { get; set; }
+        public IList<double> OutputValues { get; set; }
+        public IList<IPerceptron> Perceptrons { get; set; }
         public TOutput OutputValue { get; set; }
         public Func<IList<double>, TOutput> OutputValuesTransformation { get; set; }
 
+        public void Evaluate()
+        {
+            var values = new List<double>();
+            foreach (var perceptron in Perceptrons)
+            {
+                perceptron.InputValues = InputValues;
+                perceptron.Evaluate();
+                values.Add(perceptron.OutputValue);
+            }
+            OutputValues = values;
+        }
+
         public void Transform()
         {
-            OutputValue = OutputValuesTransformation(InputValues);
-            OutputValues = new[] {OutputValue};
+            OutputValue = OutputValuesTransformation(OutputValues);
         }
     }
 }

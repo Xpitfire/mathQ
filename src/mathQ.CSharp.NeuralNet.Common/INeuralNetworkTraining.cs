@@ -12,11 +12,10 @@ namespace mathQ.CSharp.NeuralNet.Common
 
         int MaxEpochs { get; set; }
         double LearningRate { get; set; }
-        double Momentum { get; set; }
 
-        void Initialize(int initialNumberOfInputValues, params int[] numberOfPerceptronsPerHiddenLayer);
+        void Initialize(int initialNumberOfInputValues, int initialNumberOfOutputValues, params int[] numberOfPerceptronsPerHiddenLayer);
         void Randomize();
-        void Train(IList<Tuple<TInput, double>> trainingData);
+        void Train(IList<Tuple<IList<TInput>, IList<double>>> trainingData);
         void InitializePresets(double[][][] values);
     }
 }

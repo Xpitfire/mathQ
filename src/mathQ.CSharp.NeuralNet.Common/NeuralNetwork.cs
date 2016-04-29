@@ -12,9 +12,9 @@ namespace mathQ.CSharp.NeuralNet.Common
         public IList<INeuralHiddenLayer> HiddenLayers { get; set; }
         public INeuralOutputLayer<TOutput> OutputLayer { get; set; }
 
-        public TOutput Evaluate(TInput value)
+        public TOutput Evaluate(IList<TInput> value)
         {
-            InputLayer.InitialDataSource = value;
+            InputLayer.InputValues = value;
             InputLayer.Transform();
             var curInputValues = InputLayer.OutputValues;
             var nextLayer = HiddenLayers?.GetEnumerator();
@@ -26,6 +26,7 @@ namespace mathQ.CSharp.NeuralNet.Common
                 curInputValues = curLayer.OutputValues;
             }
             OutputLayer.InputValues = curInputValues;
+            OutputLayer.Evaluate();
             OutputLayer.Transform();
             return OutputLayer.OutputValue;
         }

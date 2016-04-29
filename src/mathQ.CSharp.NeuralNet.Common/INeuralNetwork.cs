@@ -12,6 +12,6 @@ namespace mathQ.CSharp.NeuralNet.Common
         IList<INeuralHiddenLayer> HiddenLayers { get; set; }
         INeuralOutputLayer<TOutput> OutputLayer { get; set; }
 
-        TOutput Evaluate(TInput inputValue);
+        TOutput Evaluate(IList<TInput> inputValue);
     }
 }

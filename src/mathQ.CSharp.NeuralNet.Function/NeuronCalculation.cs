@@ -14,7 +14,7 @@ namespace mathQ.CSharp.NeuralNet.Function
                 throw new InvalidOperationException(
                     "Cannot evaluate Perceptron! Weights and input values must have the same length.");
             }
-            return SigmoidFunction(values.Select((t, i) => t*weights[i]).Sum() + bias);
+            return SigmoidFunction(ZVectorFunction(values, weights, bias));
         }
 
         public static double ZVectorFunction(IList<double> values, IList<double> weights, double bias)
@@ -27,10 +27,35 @@ namespace mathQ.CSharp.NeuralNet.Function
             return 1.0 / (1.0 + Math.Exp(-value));
         }
 
-        public static double SigmoidPrimeFunction(double value)
+        public static double GradientSigmoidFunction(double value)
         {
             return NeuronCalculation.SigmoidFunction(value) *
                    (1 - NeuronCalculation.SigmoidFunction(value));
+        }
+
+        public static IList<double> VectorSubtraction(IList<double> v1, IList<double> v2)
+        {
+            return v1.Select((t, i) => t - v2[i]).ToList();
+        }
+
+        public static IList<double> GradientSigmoidFunction(IList<double> values)
+        {
+            return values.Select(GradientSigmoidFunction).ToList();
+        }
+
+        public static double VectorDotProduct(IList<double> v1, IList<double> v2)
+        {
+            return v1.Select((t, i) => t*v2[i]).Sum();
+        }
+
+        public static IList<double> VectorScalarMultiplication(double prevLayerDelta, IList<double> outputValues)
+        {
+            return outputValues.Select(d => d*prevLayerDelta).ToList();
+        }
+
+        public static IList<double> VectorAdd(IList<double> v1, IList<double> v2)
+        {
+            return v1.Select((t, i) => t + v2[i]).ToList();
         }
     }
 }

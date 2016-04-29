@@ -9,19 +9,19 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
     [TestClass]
     public class NeuralNetTest
     {
-        private static INeuralInputLayer<IList<int>> inputLayer;
+        private static INeuralInputLayer<int> inputLayer;
         private static IList<INeuralHiddenLayer> hiddenLayers;
         private static INeuralOutputLayer<double> outputLayer;
-        private static INeuralNetwork<IList<int>, double> neuralNetwork; 
-        private static INeuralNetworkTraining<IList<int>, double> neuralNetworkTraining;
+        private static INeuralNetwork<int, double> neuralNetwork; 
+        private static INeuralNetworkTraining<int, double> neuralNetworkTraining;
 
         private static readonly List<int> TestData1 = new List<int> {2, -5, 4, -32, -234};
         private static readonly List<int> TestData2 = new List<int> {2, 2, 4, -32, 34};
         private static readonly List<int> TestData3 = new List<int> {2, 22, 554, -32, -234};
 
-        private static void InitializePresets(int initialNumberOfInputValues, params int[] numberOfPerceptronsPerHiddenLayer)
+        private static void InitializePresets(int initialNumberOfInputValues, int initialNumberOfOutputValues, params int[] numberOfPerceptronsPerHiddenLayer)
         {
-            inputLayer = new NeuralInputLayer<IList<int>>
+            inputLayer = new NeuralInputLayer<int>
             {
                 InputValueTransformation = values => values.Select(i => (double)i).ToList()
             };
@@ -54,19 +54,19 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
                 OutputValuesTransformation = values => values.Sum()
             };
 
-            neuralNetwork = new NeuralNetwork<IList<int>, double>
+            neuralNetwork = new NeuralNetwork<int, double>
             {
                 InputLayer = inputLayer,
                 HiddenLayers = hiddenLayers,
                 OutputLayer = outputLayer
             };
 
-            neuralNetworkTraining = new NeuralNetworkTraining<IList<int>, double>
+            neuralNetworkTraining = new NeuralNetworkTraining<int, double>
             {
                 NeuralNetwork = neuralNetwork,
                 MaxEpochs = 1000,
             };
-            neuralNetworkTraining.Initialize(initialNumberOfInputValues, numberOfPerceptronsPerHiddenLayer);
+            neuralNetworkTraining.Initialize(initialNumberOfInputValues, initialNumberOfOutputValues, numberOfPerceptronsPerHiddenLayer);
         }
 
 
@@ -83,25 +83,25 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
         [TestMethod]
         public void TestNeuralNetTrainingData()
         {
-            InitializePresets(5, 7, 5);
+            InitializePresets(5, 7, 1);
 
             neuralNetworkTraining.Train(
-                new List<Tuple<IList<int>, double>>
+                new List<Tuple<IList<int>, IList<double>>>
                 {
-                    new Tuple<IList<int>, double>(new List<int> {1, 0, 0, 0, 0}, 1.0),
-                    new Tuple<IList<int>, double>(new List<int> {1, 0, 0, 0, 0}, 1.0),
-                    new Tuple<IList<int>, double>(new List<int> {1, 0, 0, 0, 0}, 1.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 1, 0, 0, 0}, 2.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 1, 0, 0, 0}, 2.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 1, 0, 0, 0}, 2.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 1, 0, 0, 0}, 2.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 0, 1, 0, 0}, 3.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 0, 1, 0, 0}, 3.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 0, 1, 0, 0}, 3.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 0, 0, 1, 0}, 4.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 0, 0, 1, 0}, 4.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 0, 0, 0, 1}, 5.0),
-                    new Tuple<IList<int>, double>(new List<int> {0, 0, 0, 0, 1}, 5.0)
+                    new Tuple<IList<int>, IList<double>>(new [] {1, 0, 0, 0, 0}, new [] {1.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {1, 0, 0, 0, 0}, new [] {1.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {1, 0, 0, 0, 0}, new [] {1.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 1, 0, 0, 0}, new [] {2.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 1, 0, 0, 0}, new [] {2.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 1, 0, 0, 0}, new [] {2.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 1, 0, 0, 0}, new [] {2.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 0, 1, 0, 0}, new [] {3.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 0, 1, 0, 0}, new [] {3.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 0, 1, 0, 0}, new [] {3.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 0, 0, 1, 0}, new [] {4.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 0, 0, 1, 0}, new [] {4.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 0, 0, 0, 1}, new [] {5.0}),
+                    new Tuple<IList<int>, IList<double>>(new [] {0, 0, 0, 0, 1}, new [] {5.0})
                 });
             var val = new List<int> {1, 0, 0, 0, 0};
             var res = neuralNetwork.Evaluate(val);
