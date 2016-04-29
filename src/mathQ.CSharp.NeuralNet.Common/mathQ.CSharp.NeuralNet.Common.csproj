@@ -48,14 +48,14 @@
     <Compile Include="INeuron.cs" />
     <Compile Include="IPerceptron.cs" />
     <Compile Include="INeuralHiddenLayer.cs" />
-    <Compile Include="ITrainingData.cs" />
+    <Compile Include="INeuralNetworkTraining.cs" />
     <Compile Include="NeuralInputLayer.cs" />
     <Compile Include="NeuralNetwork.cs" />
     <Compile Include="NeuralOutputLayer.cs" />
     <Compile Include="NeuronHiddenLayer.cs" />
     <Compile Include="Perceptron.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrainingData.cs" />
+    <Compile Include="NeuralNetworkTraining.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

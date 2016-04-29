@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace mathQ.CSharp.NeuralNet.Common
 {
-    public interface ITrainingData<TInput, TOutput>
+    public interface INeuralNetworkTraining<TInput, TOutput>
     {
-        INeuralInputLayer<TInput> InputLayer { get; set; }
-        IList<INeuralHiddenLayer> HiddenLayers { get; set; }
-        INeuralOutputLayer<TOutput> OutputLayer { get; set; }
+        INeuralNetwork<TInput, TOutput> NeuralNetwork { get; set; }
+
         int MaxEpochs { get; set; }
         double LearningRate { get; set; }
         double Momentum { get; set; }
 
+        void Initialize(int initialNumberOfInputValues, params int[] numberOfPerceptronsPerHiddenLayer);
         void Randomize();
-        void Train(IList<TInput> trainingValues, IList<TOutput> outputValues);
+        void Train(IList<Tuple<TInput, double>> trainingData);
         void InitializePresets(double[][][] values);
     }
 }

@@ -8,9 +8,9 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public class NeuralNetwork<TInput, TOutput> : INeuralNetwork<TInput, TOutput>
     {
-        public INeuralInputLayer<TInput> InputLayer { get; private set; }
-        public IList<INeuralHiddenLayer> HiddenLayers { get; private set; }
-        public INeuralOutputLayer<TOutput> OutputLayer { get; private set; }
+        public INeuralInputLayer<TInput> InputLayer { get; set; }
+        public IList<INeuralHiddenLayer> HiddenLayers { get; set; }
+        public INeuralOutputLayer<TOutput> OutputLayer { get; set; }
 
         public TOutput Evaluate(TInput value)
         {
@@ -30,11 +30,5 @@ namespace mathQ.CSharp.NeuralNet.Common
             return OutputLayer.OutputValue;
         }
         
-        public void Train(ITrainingData<TInput, TOutput> trainingDataset)
-        {
-            InputLayer = trainingDataset.InputLayer;
-            HiddenLayers = trainingDataset.HiddenLayers;
-            OutputLayer = trainingDataset.OutputLayer;
-        }
     }
 }
