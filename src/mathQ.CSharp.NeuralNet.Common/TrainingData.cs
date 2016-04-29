@@ -47,11 +47,16 @@ namespace mathQ.CSharp.NeuralNet.Common
             }
         }
 
-        public void Randomize(double minWeight, double maxWeight, double minBias, double maxBias)
+        public void Randomize()
         {
+            const double minWeight = 0.01;
+            const double maxWeight = 1.0;
+            const int minBias = 1;
+            const int maxBias = 10;
+
             var random = new Random();
-            var weightRange = maxWeight - minWeight;
-            var biasRange = maxBias - minBias;
+            const double weightRange = maxWeight - minWeight;
+            const int biasRange = maxBias - minBias;
             foreach (var perceptron in HiddenLayers.SelectMany(hiddenLayer => hiddenLayer.Perceptrons))
             {
                 perceptron.Bias = random.NextDouble()*biasRange + minBias;
@@ -61,11 +66,12 @@ namespace mathQ.CSharp.NeuralNet.Common
                 }
             }
         }
-
-        public void Train(IList<TInput> trainingValues)
+        
+        public void Train(IList<TInput> trainingValues, IList<TOutput> outputValues)
         {
-            for (var e = 0; e < MaxEpochs; e++)
+            for (var epoch = 0; epoch < MaxEpochs; epoch++)
             {
+                Randomize();
                 foreach (var dataSet in trainingValues.Select(ComputeHiddenLayerData))
                 {
                     for (var i = 0; i < HiddenLayers.Count; i++)
@@ -114,8 +120,8 @@ namespace mathQ.CSharp.NeuralNet.Common
                 HiddenLayers.Add(hiddenLayer);
             }
         }
-
-        public double[][] ComputeHiddenLayerData(TInput value)
+        
+        private double[][] ComputeHiddenLayerData(TInput value)
         {
             var dataSet = new double[HiddenLayers.Count][];
             for (var i = 0; i < dataSet.Length; i++)

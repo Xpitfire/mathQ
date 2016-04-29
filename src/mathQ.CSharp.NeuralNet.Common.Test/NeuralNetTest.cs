@@ -81,15 +81,25 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
             {
                 InputLayer = InputLayer,
                 OutputLayer = OutputLayer,
-                MaxEpochs = 100,
+                MaxEpochs = 1000,
             };
 
             TrainingData.Randomize();
             TrainingData.Train(new List<IList<int>>
             {
-                TestData1,
-                TestData2,
-                TestData3
+                new List<int> {2, -51, 34, -32, -234},
+                new List<int> {3, -3, 41, -2, -234},
+                new List<int> {-2, -77, 4, -3, -234},
+                new List<int> {-82, 5, -4, -52, 34},
+                new List<int> {23, 75, 4, -32, -234},
+                new List<int> {211, 75, 4, 42, -34},
+                new List<int> {-32, -75, -4, 432, -234},
+                new List<int> {-2, 59, 4, 32, 234},
+                new List<int> {2, 75, 4, 32, -234},
+                new List<int> {-2, 75, -4, 9, 234},
+                new List<int> {2, 95, 4, 1, 234},
+                new List<int> {2, -15, 54, 132, -234},
+                new List<int> {12, -5, -34, 32, -234}
             });
 
             

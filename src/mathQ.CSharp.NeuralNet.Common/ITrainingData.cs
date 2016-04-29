@@ -15,8 +15,8 @@ namespace mathQ.CSharp.NeuralNet.Common
         double LearningRate { get; set; }
         double Momentum { get; set; }
 
-        void Randomize(double minWeight = -10.0, double maxWeight = 10.0, double minBias = 1, double maxBias = 10);
-        void Train(IList<TInput> trainingValues);
+        void Randomize();
+        void Train(IList<TInput> trainingValues, IList<TOutput> outputValues);
         void InitializePresets(double[][][] values);
     }
 }
