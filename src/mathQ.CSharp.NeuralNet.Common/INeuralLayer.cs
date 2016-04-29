@@ -4,8 +4,8 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public interface INeuralLayer<TInput, TOutput>
     {
-        IEnumerable<TInput> InputValues { get; set; }
-        IEnumerable<TOutput> OutputValues { get; set; }
+        IList<TInput> InputValues { get; set; }
+        IList<TOutput> OutputValues { get; set; }
     }
 
     

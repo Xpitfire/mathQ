@@ -9,14 +9,22 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
     [TestClass]
     public class NeuralNetTest
     {
-        [TestMethod]
-        public void TestNeuralNetOneHiddenLayerTwoPerceptrons()
+        private static INeuralInputLayer<IList<int>> InputLayer;
+        private static IList<INeuralHiddenLayer> HiddenLayers;
+        private static INeuralOutputLayer<double> OutputLayer;
+        private static ITrainingData<IList<int>, double> TrainingData;
+
+        private static readonly List<int> TestData1 = new List<int> {2, -5, 4, -32, -234};
+        private static readonly List<int> TestData2 = new List<int> {2, 2, 4, -32, 34};
+        private static readonly List<int> TestData3 = new List<int> {2, 22, 554, -32, -234};
+
+        private static void InitializePresets()
         {
-            var inputLayer = new NeuralInputLayer<int>
+            InputLayer = new NeuralInputLayer<IList<int>>
             {
-                InputValueTransformation = chr => chr
+                InputValueTransformation = values => values.Select(i => (double)i).ToList()
             };
-            var hiddenLayers = new List<INeuralHiddenLayer>
+            HiddenLayers = new List<INeuralHiddenLayer>
             {
                 new NeuronHiddenLayer
                 {
@@ -25,37 +33,67 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
                         new Perceptron
                         {
                             Weights = new List<double> { .5, .2, .3, .4, .7 },
-                            Biases = new List<double> { 1, 2, 3, 4, 5 },
+                            Bias = 5,
                             PerceptronFunction = NeuronCalculation.PerceptronSigmoidFunction
                         },
 
                         new Perceptron
                         {
                             Weights = new List<double> { .1, .8, .7, .3, .1 },
-                            Biases = new List<double> { 5, 4, 3, 2, 1 },
+                            Bias = 1,
                             PerceptronFunction = NeuronCalculation.PerceptronSigmoidFunction
                         }
                     }
                 }
             };
-            var outputLayer = new NeuralOutputLayer<double>
+            OutputLayer = new NeuralOutputLayer<double>
             {
                 OutputValuesTransformation = values => values.Sum()
             };
 
-            var trainingData = new TrainingData<int, double>
+            TrainingData = new TrainingData<IList<int>, double>
             {
-                InputLayer = inputLayer,
-                HiddenLayers = hiddenLayers,
-                OutputLayer = outputLayer
+                InputLayer = InputLayer,
+                HiddenLayers = HiddenLayers,
+                OutputLayer = OutputLayer
+            };
+        }
+
+
+        [TestMethod]
+        public void TestNeuralNetOneHiddenLayerTwoPerceptrons()
+        {
+            InitializePresets();
+
+            var neuralNet = new NeuralNetwork<IList<int>, double>();
+            neuralNet.Train(TrainingData);
+            
+            Assert.IsTrue(neuralNet.Evaluate(TestData1) <= .1);
+            Assert.IsTrue(neuralNet.Evaluate(TestData2) >= 1.3);
+            Assert.IsTrue(neuralNet.Evaluate(TestData3) >= 1.5);
+        }
+
+        [TestMethod]
+        public void TestNeuralNetTrainingData()
+        {
+            InitializePresets();
+            TrainingData = new TrainingData<IList<int>, double>(5, 2, 3)
+            {
+                InputLayer = InputLayer,
+                OutputLayer = OutputLayer,
+                MaxEpochs = 100,
             };
 
-            var neuralNet = new NeuralNetwork<int, double>();
-            neuralNet.Train(trainingData);
+            TrainingData.Randomize();
+            TrainingData.Train(new List<IList<int>>
+            {
+                TestData1,
+                TestData2,
+                TestData3
+            });
+
             
-            Assert.IsTrue(neuralNet.Evaluate(new List<int> { 2, -5, 4, -32, -234 }) < .1);
-            Assert.IsTrue(neuralNet.Evaluate(new List<int> {2, 2, 4, -32, 34}) > 1.5);
-            Assert.IsTrue(neuralNet.Evaluate(new List<int> {2, 22, 554, -32, -234}) > 1.9);
         }
+
     }
 }

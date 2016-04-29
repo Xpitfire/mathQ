@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace mathQ.CSharp.NeuralNet.Common
 {
-    public delegate double PerceptronFunction(IReadOnlyList<double> values, IReadOnlyList<double> weights, IReadOnlyList<double> biases);
+    public delegate double PerceptronFunction(IList<double> values, IList<double> weights, double bias);
 
     public interface IPerceptron : INeuron<double, double>
     {
-        IEnumerable<double> Weights { get; set; }
-        IEnumerable<double> Biases { get; set; }
+        IList<double> Weights { get; set; }
+        double Bias { get; set; }
         PerceptronFunction PerceptronFunction { set; }
     }
 }

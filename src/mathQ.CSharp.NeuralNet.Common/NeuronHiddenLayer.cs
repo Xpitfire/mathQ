@@ -8,9 +8,9 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public class NeuronHiddenLayer : INeuralHiddenLayer
     {
-        public IEnumerable<double> InputValues { get; set; }
-        public IEnumerable<double> OutputValues { get; set; }
-        public IEnumerable<INeuron<double, double>> Perceptrons { get; set; }
+        public IList<double> InputValues { get; set; }
+        public IList<double> OutputValues { get; set; }
+        public IList<IPerceptron> Perceptrons { get; set; }
         
         public void Evaluate()
         {

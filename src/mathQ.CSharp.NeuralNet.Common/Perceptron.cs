@@ -9,21 +9,21 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public class Perceptron : IPerceptron
     {
-        public IEnumerable<double> InputValues { get; set; }
+        public IList<double> InputValues { get; set; }
         public double OutputValue { get; set; }
         public NeuronFunction<double, double> TransformationFunction { get; set; }
-        public IEnumerable<double> Weights { get; set; }
-        public IEnumerable<double> Biases { get; set; }
+        public IList<double> Weights { get; set; }
+        public double Bias { get; set; }
         public PerceptronFunction PerceptronFunction { private get; set; }
 
         public Perceptron()
         {
-            TransformationFunction = values => PerceptronFunction(values, Weights.ToList(), Biases.ToList());
+            TransformationFunction = values => PerceptronFunction(values, Weights, Bias);
         }
         
         public void Evaluate()
         {
-            OutputValue = TransformationFunction(InputValues.ToList());
+            OutputValue = TransformationFunction(InputValues);
         }
     }
 }

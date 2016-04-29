@@ -12,7 +12,7 @@ namespace mathQ.CSharp.NeuralNet.Common
         IList<INeuralHiddenLayer> HiddenLayers { get; }
         INeuralOutputLayer<TOutput> OutputLayer { get; }
 
-        TOutput Evaluate(IEnumerable<TInput> inputValue);
-        void Train(TrainingData<TInput, TOutput> trainingDataset);
+        TOutput Evaluate(TInput inputValue);
+        void Train(ITrainingData<TInput, TOutput> trainingDataset);
     }
 }

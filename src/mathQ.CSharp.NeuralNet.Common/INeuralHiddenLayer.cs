@@ -8,7 +8,7 @@ namespace mathQ.CSharp.NeuralNet.Common
 {
     public interface INeuralHiddenLayer : INeuralLayer<double, double>
     {
-        IEnumerable<INeuron<double, double>> Perceptrons { get; set; }
+        IList<IPerceptron> Perceptrons { get; set; }
 
         void Evaluate();
     }
