@@ -26,11 +26,10 @@ namespace mathQ.CSharp.NeuralNet.Function
         {
             return 1.0 / (1.0 + Math.Exp(-value));
         }
-
-        public static double GradientSigmoidFunction(double value)
+        
+        public static double GradientFunction(double value)
         {
-            return NeuronCalculation.SigmoidFunction(value) *
-                   (1 - NeuronCalculation.SigmoidFunction(value));
+            return value*(1 - value);
         }
 
         public static IList<double> VectorSubtraction(IList<double> v1, IList<double> v2)
@@ -40,12 +39,27 @@ namespace mathQ.CSharp.NeuralNet.Function
 
         public static IList<double> GradientSigmoidFunction(IList<double> values)
         {
-            return values.Select(GradientSigmoidFunction).ToList();
+            return values.Select(v => GradientFunction(SigmoidFunction(v))).ToList();
+        }
+
+        public static double GradientSigmoidFunction(double value)
+        {
+            return GradientFunction(SigmoidFunction(value));
         }
 
         public static double VectorDotProduct(IList<double> v1, IList<double> v2)
         {
             return v1.Select((t, i) => t*v2[i]).Sum();
+        }
+
+        public static double VectorDotProduct(double scalar, IList<double> v2)
+        {
+            var v1 = new List<double>(v2.Count);
+            for (var i = 0; i < v2.Count; i++)
+            {
+                v1.Add(scalar);
+            }
+            return v1.Select((t, i) => t * v2[i]).Sum();
         }
 
         public static IList<double> VectorScalarMultiplication(double prevLayerDelta, IList<double> outputValues)
@@ -56,6 +70,28 @@ namespace mathQ.CSharp.NeuralNet.Function
         public static IList<double> VectorAdd(IList<double> v1, IList<double> v2)
         {
             return v1.Select((t, i) => t + v2[i]).ToList();
+        }
+
+        public static double CostFunction(double val1, double val2)
+        {
+            return val1 - val2;
+
+        }
+
+        public static IList<double> CostFunction(IList<double> v1, IList<double> v2)
+        {
+            return VectorSubtraction(v1, v2);
+
+        }
+
+        public static IList<double> VectorMultiplication(IList<double> v1, IList<double> v2)
+        {
+            return v1.Select((v, i) => v*v2[i]).ToList();
+        }
+
+        public static double SquaredErrorFunction(double idealValue, double actualValue)
+        {
+            return .5*Math.Pow(idealValue - actualValue, 2);
         }
     }
 }

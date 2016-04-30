@@ -13,61 +13,27 @@ namespace mathQ.CSharp.NeuralNet.Common
         public int MaxEpochs { get; set; }
         public double LearningRate { get; set; } = 1.0;
 
-        public NeuralNetworkTraining()
-        {
-        }
-        
-        public void Initialize(int initialNumberOfInputValues, params int[] numberOfPerceptronsPerHiddenLayer)
-        {
-            if (numberOfPerceptronsPerHiddenLayer == null)
-                throw new ArgumentException("Cannot initialize NeuralNetworkTraining without layer and percepton size definition!");
-
-            var numberOfInputValues = initialNumberOfInputValues;
-            NeuralNetwork.HiddenLayers = new List<INeuralHiddenLayer>(numberOfPerceptronsPerHiddenLayer.Length);
-            foreach (var numberOfPerceptrons in numberOfPerceptronsPerHiddenLayer)
-            {
-                var perceptrons = new List<IPerceptron>();
-                for (var j = 0; j < numberOfPerceptrons; j++)
-                {
-                    perceptrons.Add(new Perceptron
-                    {
-                        Weights = new double[numberOfInputValues],
-                        PerceptronFunction = NeuronCalculation.ActivationFunction
-                    });
-                }
-                NeuralNetwork.HiddenLayers.Add(new NeuronHiddenLayer
-                {
-                    Perceptrons = perceptrons
-                });
-                numberOfInputValues = numberOfPerceptrons;
-            }
-            NeuralNetwork.OutputLayer = new NeuralOutputLayer<TOutput>
-            {
-                Perceptrons = new List<IPerceptron>(numberOfInputValues)
-            };
-            for (var i = 0; i < numberOfInputValues; i++)
-            {
-                NeuralNetwork.OutputLayer.Perceptrons.Add(new Perceptron
-                {
-                    Weights = new double[numberOfInputValues],
-                    PerceptronFunction = NeuronCalculation.ActivationFunction
-                });
-            }
-        }
-
         public void Randomize()
         {
             const double minWeight = 0.01;
             const double maxWeight = 1.0;
-            const int minBias = 1;
-            const int maxBias = 10;
+            const double minBias = .1;
+            const double maxBias = 1.0;
 
             var random = new Random();
             const double weightRange = maxWeight - minWeight;
-            const int biasRange = maxBias - minBias;
+            const double biasRange = maxBias - minBias;
             foreach (var perceptron in NeuralNetwork.HiddenLayers.SelectMany(hiddenLayer => hiddenLayer.Perceptrons))
             {
                 perceptron.Bias = random.NextDouble()*biasRange + minBias;
+                for (var i = 0; i < perceptron.Weights.Count(); i++)
+                {
+                    perceptron.Weights[i] = random.NextDouble() * weightRange + minWeight;
+                }
+            }
+            foreach (var perceptron in NeuralNetwork.OutputLayer.Perceptrons)
+            {
+                perceptron.Bias = random.NextDouble() * biasRange + minBias;
                 for (var i = 0; i < perceptron.Weights.Count(); i++)
                 {
                     perceptron.Weights[i] = random.NextDouble() * weightRange + minWeight;
@@ -83,35 +49,58 @@ namespace mathQ.CSharp.NeuralNet.Common
                 foreach (var data in trainingData)
                 {
                     NeuralNetwork.Evaluate(data.Item1);
-                    IList<double> computedValues = NeuralNetwork.OutputLayer.OutputValues;
-                    IList<double> actualValues = data.Item2;
-
-                    IList<INeuralHiddenLayer> layers = NeuralNetwork.HiddenLayers;
-                    INeuralOutputLayer<TOutput> outputLayer = NeuralNetwork.OutputLayer;
-
-                    IList<IPerceptron> perceptrons = outputLayer.Perceptrons;
-                    
-                    for (var i = layers.Count - 1; layers.Count > 0; i--)
+                    var deltaGradientList = new List<double>();
+                    var prevOutValues = new List<double>();
+                    var prevWeights = new List<double>();
+                    var perceptrons = NeuralNetwork.OutputLayer.Perceptrons;
+                    for (var i = 0; i < perceptrons.Count; i++)
                     {
-                        var curLayer = layers[i];
-                        IList<double> delta = NeuronCalculation.VectorSubtraction(actualValues, computedValues);
-                        double prevLayerDelta = NeuronCalculation.VectorDotProduct(delta, NeuronCalculation.GradientSigmoidFunction(computedValues));
-                        UpdateWeights(perceptrons, prevLayerDelta, layers[i]);
-                        actualValues = layers[i].OutputValues;
-                        computedValues = layers[i - 1].OutputValues;
-                        perceptrons = layers[i - 1].Perceptrons;
+                        var targetOut = data.Item2[i];
+                        var actualOut = NeuralNetwork.OutputLayer.OutputValues[i];
+                        var deltaOut = actualOut - targetOut;
+                        var gradientActualOut = NeuronCalculation.GradientFunction(actualOut);
+                        var deltaGradient = deltaOut*gradientActualOut;
+                        var prevOutValue = perceptrons[i].InputValues[i];
+                        deltaGradientList.Add(deltaGradient);
+                        prevOutValues.Add(prevOutValue);
+                        var outChangeRate = deltaGradient*prevOutValue;
+                        for (var j = 0; j < perceptrons[i].Weights.Count; j++)
+                        {
+                            prevWeights.Add(perceptrons[i].Weights[j]);
+                            perceptrons[i].Weights[j] = perceptrons[i].Weights[j] - LearningRate*outChangeRate;
+                        }
                     }
-                    
+
+                    foreach (var hiddenLayer in NeuralNetwork.HiddenLayers)
+                    {
+                        var inputValues = hiddenLayer.InputValues;
+                        for (var i = 0; i < hiddenLayer.Perceptrons.Count; i++)
+                        {
+                            var perceptron = hiddenLayer.Perceptrons[i];
+                            var errorSum = 0.0;
+                            for (var j = 0; j < deltaGradientList.Count; j++)
+                            {
+                                errorSum += deltaGradientList[j]*prevWeights[i + j*hiddenLayer.Perceptrons.Count];
+                            }
+
+                            for (var j = 0; j < perceptron.Weights.Count; j++)
+                            {
+                                var gradientOut0 = NeuronCalculation.GradientFunction(perceptron.OutputValue);
+                                var inChangeRate0 = errorSum*gradientOut0*inputValues[j];
+                                perceptron.Weights[j] = perceptron.Weights[j] - LearningRate*inChangeRate0;
+                            }
+                        }
+                    }
                 }
             }
+            
         }
 
         private void UpdateWeights(IList<IPerceptron> perceptrons, double prevLayerDelta, INeuralHiddenLayer neuralHiddenLayer)
         {
             foreach (var perceptron in perceptrons)
             {
-                perceptron.Weights = NeuronCalculation.VectorAdd(perceptron.Weights, 
-                    NeuronCalculation.VectorScalarMultiplication(prevLayerDelta, neuralHiddenLayer.OutputValues));
+                perceptron.Weights = NeuronCalculation.VectorScalarMultiplication(prevLayerDelta, neuralHiddenLayer.OutputValues);
             }
         }
 
@@ -128,7 +117,6 @@ namespace mathQ.CSharp.NeuralNet.Common
                 {
                     var perceptron = new Perceptron
                     {
-                        PerceptronFunction = NeuronCalculation.ActivationFunction,
                         Weights = new double[weightVal.Length]
                     };
                     var len = weightVal.Length - 1;
@@ -142,41 +130,5 @@ namespace mathQ.CSharp.NeuralNet.Common
                 NeuralNetwork.HiddenLayers.Add(hiddenLayer);
             }
         }
-        
-        private double[][] ComputeHiddenLayerData(IList<double> values)
-        {
-            var numberOfLayers = NeuralNetwork.HiddenLayers.Count + 1;
-            var dataSet = new double[numberOfLayers][];
-            for (var i = 0; i < dataSet.Length; i++)
-            {
-                dataSet[i] = new double[NeuralNetwork.HiddenLayers[i].Perceptrons.Count];
-            }
-            
-            var curInputValues = values;
-            var nextLayer = NeuralNetwork.HiddenLayers?.GetEnumerator();
-
-            var j = 0;
-            while (nextLayer?.MoveNext() ?? false)
-            {
-                var curLayer = nextLayer.Current;
-                curLayer.InputValues = curInputValues;
-                curLayer.Evaluate();
-
-                var k = 0;
-                foreach (var perceptron in curLayer.Perceptrons)
-                {
-                    dataSet[j][k] = perceptron.OutputValue;
-                    k++;
-                }
-                curInputValues = curLayer.OutputValues;
-                j++;
-            }
-            NeuralNetwork.OutputLayer.InputValues = curInputValues;
-            NeuralNetwork.OutputLayer.Transform();
-            dataSet[numberOfLayers - 1] = NeuralNetwork.OutputLayer.OutputValues.ToArray(); 
-
-            return dataSet;
-        }
-        
     }
 }

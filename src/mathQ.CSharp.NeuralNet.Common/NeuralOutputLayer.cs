@@ -11,7 +11,8 @@ namespace mathQ.CSharp.NeuralNet.Common
         public IList<double> InputValues { get; set; }
         public IList<double> OutputValues { get; set; }
         public IList<IPerceptron> Perceptrons { get; set; }
-        public TOutput OutputValue { get; set; }
+        public TOutput OutputValue => OutputValuesTransformation != null ? OutputValuesTransformation(OutputValues) : default(TOutput);
+
         public Func<IList<double>, TOutput> OutputValuesTransformation { get; set; }
 
         public void Evaluate()
@@ -25,10 +26,6 @@ namespace mathQ.CSharp.NeuralNet.Common
             }
             OutputValues = values;
         }
-
-        public void Transform()
-        {
-            OutputValue = OutputValuesTransformation(OutputValues);
-        }
+        
     }
 }

@@ -12,6 +12,7 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         IList<double> Weights { get; set; }
         double Bias { get; set; }
-        PerceptronFunction PerceptronFunction { set; }
+        double ZVectorValue { get; }
+        double SigmoidZVectorValue { get; }
     }
 }
