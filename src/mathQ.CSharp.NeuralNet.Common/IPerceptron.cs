@@ -12,7 +12,5 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         IList<double> Weights { get; set; }
         double Bias { get; set; }
-        double ZVectorValue { get; }
-        double SigmoidZVectorValue { get; }
     }
 }

@@ -14,14 +14,11 @@ namespace mathQ.CSharp.NeuralNet.Common
         public double OutputValue { get; private set; }
         public IList<double> Weights { get; set; }
         public double Bias { get; set; } = 1.0;
-        public double ZVectorValue { get; private set; }
-        public double SigmoidZVectorValue { get; private set; }
         
         public void Evaluate()
         {
-            ZVectorValue = NeuronCalculation.ZVectorFunction(InputValues, Weights, Bias);
-            SigmoidZVectorValue = NeuronCalculation.SigmoidFunction(ZVectorValue);
-            OutputValue = SigmoidZVectorValue;
+            OutputValue = 1.0 / (1.0 + Math.Exp(
+                -InputValues.Select((t, i) => t * Weights[i]).Sum() + Bias));
         }
     }
 }
