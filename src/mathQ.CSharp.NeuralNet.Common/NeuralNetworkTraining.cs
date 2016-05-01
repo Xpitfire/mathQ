@@ -73,7 +73,6 @@ namespace mathQ.CSharp.NeuralNet.Common
                         var hiddenLayer = NeuralNetwork.HiddenLayers[k];
                         var curDeltaGradientList = new List<double>();
                         var curWeights = new List<double>();
-                        var prevPerceptrons = perceptrons;
                         perceptrons = hiddenLayer.Perceptrons;
                         for (var i = 0; i < perceptrons.Count; i++)
                         {
@@ -101,17 +100,8 @@ namespace mathQ.CSharp.NeuralNet.Common
                     }
                 }
             }
-            
         }
-
-        private void UpdateWeights(IList<IPerceptron> perceptrons, double prevLayerDelta, INeuralHiddenLayer neuralHiddenLayer)
-        {
-            foreach (var perceptron in perceptrons)
-            {
-                perceptron.Weights = NeuronCalculation.VectorScalarMultiplication(prevLayerDelta, neuralHiddenLayer.OutputValues);
-            }
-        }
-
+        
         public void InitializePresets(double[][][] values)
         {
             NeuralNetwork.HiddenLayers = new INeuralHiddenLayer[values.Length];
