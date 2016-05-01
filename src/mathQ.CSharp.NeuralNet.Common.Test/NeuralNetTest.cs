@@ -28,8 +28,8 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
             neuralNetworkTraining = new NeuralNetworkTraining<double, double>
             {
                 NeuralNetwork = neuralNetwork,
-                MaxEpochs = 10000,
-                LearningRate = .5
+                MaxEpochs = 100000,
+                LearningRate = 1
             };
         }
 
@@ -53,18 +53,19 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
         [TestMethod]
         public void TestNeuralNetTrainingData2()
         {
-            InitializePresets(2, 2, 4, 3);
+            InitializePresets(2, 2, 6, 4, 8, 6, 10);
+            neuralNetworkTraining.Randomize();
+            neuralNetwork.Evaluate(new[] { .05, .10 });
+
             neuralNetworkTraining.Train(
                 new List<Tuple<IList<double>, IList<double>>>
                 {
-                    new Tuple<IList<double>, IList<double>>(new [] {.05, .10}, new [] {.01, .99}),
+                    new Tuple<IList<double>, IList<double>>(new [] {0.05, 0.10}, new [] {0.01, 0.99})
                 });
 
-            var val = new List<double> { .05, .10 };
-            neuralNetwork.Evaluate(val);
-
-            Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[0] - .01) <= .005);
-            Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[1] - .99) <= .005);
+            neuralNetwork.Evaluate(new [] { .05, .10 });
+            Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[0] - .01) <= 0.01);
+            Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[1] - .99) <= 0.99);
         }
 
     }

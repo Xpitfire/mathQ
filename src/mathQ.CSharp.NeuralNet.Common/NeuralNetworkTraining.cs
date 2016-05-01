@@ -11,7 +11,7 @@ namespace mathQ.CSharp.NeuralNet.Common
     {
         public INeuralNetwork<TInput, TOutput> NeuralNetwork { get; set; }
         public int MaxEpochs { get; set; }
-        public double LearningRate { get; set; } = 1.0;
+        public double LearningRate { get; set; } = .5;
 
         public void Randomize()
         {
@@ -82,7 +82,7 @@ namespace mathQ.CSharp.NeuralNet.Common
                             var errorSum = 0.0;
                             for (var j = 0; j < prevDeltaGradientList.Count; j++)
                             {
-                                var idx = j + (j*prevWeights.Count/prevPerceptrons.Count%prevWeights.Count - 1);
+                                var idx = i + j*perceptrons.Count;
                                 errorSum += prevDeltaGradientList[j]*prevWeights[idx];
                             }
                             curDeltaGradientList.Add(errorSum);
