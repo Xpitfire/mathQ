@@ -49,8 +49,7 @@ namespace mathQ.CSharp.NeuralNet.Common
                 foreach (var data in trainingData)
                 {
                     NeuralNetwork.Evaluate(data.Item1);
-                    var deltaGradientList = new List<double>();
-                    var prevOutValues = new List<double>();
+                    var prevDeltaGradientList = new List<double>();
                     var prevWeights = new List<double>();
                     var perceptrons = NeuralNetwork.OutputLayer.Perceptrons;
                     for (var i = 0; i < perceptrons.Count; i++)
@@ -58,11 +57,9 @@ namespace mathQ.CSharp.NeuralNet.Common
                         var targetOut = data.Item2[i];
                         var actualOut = NeuralNetwork.OutputLayer.OutputValues[i];
                         var deltaOut = actualOut - targetOut;
-                        var gradientActualOut = NeuronCalculation.GradientFunction(actualOut);
-                        var deltaGradient = deltaOut*gradientActualOut;
+                        var deltaGradient = deltaOut*NeuronCalculation.GradientFunction(actualOut);
                         var prevOutValue = perceptrons[i].InputValues[i];
-                        deltaGradientList.Add(deltaGradient);
-                        prevOutValues.Add(prevOutValue);
+                        prevDeltaGradientList.Add(deltaGradient);
                         var outChangeRate = deltaGradient*prevOutValue;
                         for (var j = 0; j < perceptrons[i].Weights.Count; j++)
                         {
@@ -70,26 +67,37 @@ namespace mathQ.CSharp.NeuralNet.Common
                             perceptrons[i].Weights[j] = perceptrons[i].Weights[j] - LearningRate*outChangeRate;
                         }
                     }
-
-                    foreach (var hiddenLayer in NeuralNetwork.HiddenLayers)
+                    
+                    for(var k = NeuralNetwork.HiddenLayers.Count - 1; k >= 0; k--)
                     {
-                        var inputValues = hiddenLayer.InputValues;
-                        for (var i = 0; i < hiddenLayer.Perceptrons.Count; i++)
+                        var hiddenLayer = NeuralNetwork.HiddenLayers[k];
+                        var curDeltaGradientList = new List<double>();
+                        var curWeights = new List<double>();
+                        var prevPerceptrons = perceptrons;
+                        perceptrons = hiddenLayer.Perceptrons;
+                        for (var i = 0; i < perceptrons.Count; i++)
                         {
-                            var perceptron = hiddenLayer.Perceptrons[i];
+                            // compute the new error value for the current layer
+                            var perceptron = perceptrons[i];
                             var errorSum = 0.0;
-                            for (var j = 0; j < deltaGradientList.Count; j++)
+                            for (var j = 0; j < prevDeltaGradientList.Count; j++)
                             {
-                                errorSum += deltaGradientList[j]*prevWeights[i + j*hiddenLayer.Perceptrons.Count];
+                                var idx = j + (j*prevWeights.Count/prevPerceptrons.Count%prevWeights.Count - 1);
+                                errorSum += prevDeltaGradientList[j]*prevWeights[idx];
                             }
+                            curDeltaGradientList.Add(errorSum);
 
+                            // compute the new weights
                             for (var j = 0; j < perceptron.Weights.Count; j++)
                             {
                                 var gradientOut0 = NeuronCalculation.GradientFunction(perceptron.OutputValue);
-                                var inChangeRate0 = errorSum*gradientOut0*inputValues[j];
+                                var inChangeRate0 = errorSum*gradientOut0*hiddenLayer.InputValues[j];
+                                curWeights.Add(perceptron.Weights[j]);
                                 perceptron.Weights[j] = perceptron.Weights[j] - LearningRate*inChangeRate0;
                             }
                         }
+                        prevDeltaGradientList = curDeltaGradientList;
+                        prevWeights = curWeights;
                     }
                 }
             }

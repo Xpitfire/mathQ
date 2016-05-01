@@ -13,14 +13,14 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
         private static INeuralNetwork<double, double> neuralNetwork; 
         private static INeuralNetworkTraining<double, double> neuralNetworkTraining;
 
-        private static void InitializePresets()
+        private static void InitializePresets(int initialNumberOfInputValues, int initialNumberOfOutputValues, params int[] numberOfPerceptronsPerHiddenLayer)
         {
             inputLayer = new NeuralInputLayer<double>
             {
                 InputValueTransformation = values => values.Select(i => i).ToList()
             };
 
-            neuralNetwork = new NeuralNetwork<double, double>(2, 2, 2)
+            neuralNetwork = new NeuralNetwork<double, double>(initialNumberOfInputValues, initialNumberOfOutputValues, numberOfPerceptronsPerHiddenLayer)
             {
                 InputLayer = inputLayer
             };
@@ -28,7 +28,7 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
             neuralNetworkTraining = new NeuralNetworkTraining<double, double>
             {
                 NeuralNetwork = neuralNetwork,
-                MaxEpochs = 100000,
+                MaxEpochs = 10000,
                 LearningRate = .5
             };
         }
@@ -36,7 +36,7 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
         [TestMethod]
         public void TestNeuralNetTrainingData()
         {
-            InitializePresets();
+            InitializePresets(2, 2, 2);
             neuralNetworkTraining.Train(
                 new List<Tuple<IList<double>, IList<double>>>
                 {
@@ -49,6 +49,23 @@ namespace mathQ.CSharp.NeuralNet.Common.Test
             Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[0] - .01) <= .005);
             Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[1] - .99) <= .005);
         }
-        
+
+        [TestMethod]
+        public void TestNeuralNetTrainingData2()
+        {
+            InitializePresets(2, 2, 4, 3);
+            neuralNetworkTraining.Train(
+                new List<Tuple<IList<double>, IList<double>>>
+                {
+                    new Tuple<IList<double>, IList<double>>(new [] {.05, .10}, new [] {.01, .99}),
+                });
+
+            var val = new List<double> { .05, .10 };
+            neuralNetwork.Evaluate(val);
+
+            Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[0] - .01) <= .005);
+            Assert.IsTrue(Math.Abs(neuralNetwork.OutputLayer.OutputValues[1] - .99) <= .005);
+        }
+
     }
 }
