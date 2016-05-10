@@ -3,3 +3,17 @@ src/mathQ.VC.VC.opendb
 src/mathQ.VC.db
 src/mathQ.CSharp.NeuralNet.Common.Test/obj/
 src/mathQ.CSharp.NeuralNet.Function/obj/
+src/mathQ.Prototype.App/mathQ.Prototype.App.Droid/obj/
+src/mathQ.Prototype.App/mathQ.Prototype.App.Droid/bin/
+src/mathQ.Prototype.App/mathQ.Prototype.App.UWP/bin/
+src/mathQ.Prototype.App/mathQ.Prototype.App.UWP/obj/
+src/mathQ.Prototype.App/mathQ.Prototype.App.WinPhone/obj/
+src/mathQ.Prototype.App/mathQ.Prototype.App.Windows/obj/
+src/mathQ.Prototype.App/mathQ.Prototype.App.WinPhone/bin/
+src/mathQ.Prototype.App/mathQ.Prototype.App.Windows/bin/
+src/mathQ.Prototype.App/mathQ.Prototype.App/bin/
+src/mathQ.Prototype.App/mathQ.Prototype.App/obj/
+src/packages/SkiaSharp.1.49.1.0/build/
+src/mathQ.Prototype.App/mathQ.Prototype.App.UWP/AppPackages/
+src/packages/
+src/mathQ.Prototype.App/mathQ.Prototype.App.iOS/obj/

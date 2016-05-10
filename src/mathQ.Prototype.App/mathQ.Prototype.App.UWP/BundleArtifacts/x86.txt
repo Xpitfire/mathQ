@@ -1,0 +1,2 @@
+MainPackage=C:\Data\Projects\mathQ\src\mathQ.Prototype.App\mathQ.Prototype.App.UWP\bin\x86\Debug\mathQ.Prototype.App.UWP_1.0.1.0_x86_Debug.appx
+SymbolPackage=C:\Data\Projects\mathQ\src\mathQ.Prototype.App\mathQ.Prototype.App.UWP\AppPackages\mathQ.Prototype.App.UWP_1.0.1.0_Debug_Test\mathQ.Prototype.App.UWP_1.0.1.0_x86_Debug.appxsym
